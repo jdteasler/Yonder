@@ -1,0 +1,49 @@
+﻿@page "/"
+
+@using Yonder.DataProvider
+
+<h3>Classes</h3>
+@if (classes is null)
+{
+    <h4>Loading......</h4>
+}
+else
+{
+    <table class="table-striped table-light">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Class</th>
+                <th>Description</th>
+                <th>Teacher</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach( var clas in classes)
+            {
+            <tr class="table-hover">
+                <th class="col-auto">@clas.Id</th>
+                <th class="col-auto">@clas.ClassName</th>
+                <th class="col-auto">@clas.Description</th>
+                <th class="col-auto">@clas.TeacherName</th>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    
+    private List<Yonder.DataProvider.Classes> classes;
+    
+    protected override void OnInitialized()
+    {
+
+        using(var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
+        {
+            classes = dbContext.Classes.ToList();
+        }
+    }
+}
