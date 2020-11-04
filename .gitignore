@@ -2,3 +2,4 @@ bin
 obj
 config
 .vs
+/Yonder/Yonder.csproj.user

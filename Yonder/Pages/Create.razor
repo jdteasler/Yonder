@@ -1,0 +1,52 @@
+﻿@page "/Class/Create"
+
+@using Yonder.Models
+@using Yonder.DataProvider
+
+@inject NavigationManager navigationManager
+<h3>Create</h3>
+
+<EditForm Model="@clas" OnValidSubmit="HandleValidSubmit">
+    <div class="form-group">
+        <label class="form-control-plaintext">Class Name</label>
+        <InputText @bind-Value="clas.ClassName" class="form-control" />
+        <ValidationMessage For="@(() => clas.ClassName)" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <label class="form-control-plaintext">Description</label>
+        <InputText @bind-Value="clas.Description" class="form-control" />
+        <ValidationMessage For="@(() => clas.Description)" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <label class="form-control-plaintext">Teacher</label>
+        <InputText @bind-Value="clas.TeacherName" class="form-control" />
+        <ValidationMessage For="@(() => clas.TeacherName)" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create Class" class="btn btn-primary" />
+    </div>
+</EditForm>
+
+@code {
+    private ClassModel clas = new ClassModel();
+
+    private async Task HandleValidSubmit()
+    {
+        var newClass = new Yonder.DataProvider.Classes
+        {
+            ClassName = clas.ClassName,
+            Description = clas.Description,
+            TeacherName = clas.TeacherName
+        };
+
+        using (var dbContext = new YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
+        {
+            dbContext.Classes.Add(newClass);
+
+            await dbContext.SaveChangesAsync();
+        }
+
+        navigationManager.NavigateTo($"/Class/display/{newClass.Id}");
+    }
+
+}
