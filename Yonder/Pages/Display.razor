@@ -1,0 +1,40 @@
+﻿@page "/Class/Display/{Id:int}"
+<h3>Display</h3>
+
+<table>
+    <tbody>
+        <tr>
+            <td>Class: </td>
+            <td>@clas.ClassName</td>
+        </tr>
+        <tr>
+            <td>Description: </td>
+            <td>@clas.Description</td>
+        </tr>
+        <tr>
+            <td>Teacher: </td>
+            <td>@clas.TeacherName</td>
+        </tr>
+        @if (clas.EndDate != null)
+        {
+            <tr>
+                <td>Ended On: </td>
+                <td>@clas.EndDate</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Yonder.DataProvider.Classes clas;
+
+    protected override void OnInitialized()
+    {
+        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
+        {
+            clas = dbContext.Classes.Where(c => c.Id == Id).FirstOrDefault();
+        }
+    }
+}
