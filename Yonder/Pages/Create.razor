@@ -1,6 +1,5 @@
 ﻿@page "/Class/Create"
 
-@using Yonder.Models
 @using Yonder.DataProvider
 
 @inject NavigationManager navigationManager
@@ -28,25 +27,19 @@
 </EditForm>
 
 @code {
-    private ClassModel clas = new ClassModel();
-
+    private Yonder.DataProvider.Classes clas = new Yonder.DataProvider.Classes();
     private async Task HandleValidSubmit()
     {
-        var newClass = new Yonder.DataProvider.Classes
-        {
-            ClassName = clas.ClassName,
-            Description = clas.Description,
-            TeacherName = clas.TeacherName
-        };
+
 
         using (var dbContext = new YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
         {
-            dbContext.Classes.Add(newClass);
+            dbContext.Classes.Add(clas);
 
             await dbContext.SaveChangesAsync();
         }
 
-        navigationManager.NavigateTo($"/Class/display/{newClass.Id}");
+        navigationManager.NavigateTo($"/Class/display/{clas.Id}");
     }
 
 }

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Yonder.DataProvider
+namespace Yonder.Models
 {
-    public class RollCall
+    public class RollCallModel
     {
-        public int Id { get; set; }
         public int ClassId { get; set; }
         public DateTime ClassDate { get; set; }
         public int ClassSize { get; set; }
