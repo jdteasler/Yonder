@@ -14,7 +14,7 @@ namespace Yonder.DataProvider
             this.connectionString = connectionString;
         }
         public DbSet<Classes> Classes { get; set; }
-        public DbSet<RollCall> RollCalls { get; set; }
+        public DbSet<RollCall> RollCall { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

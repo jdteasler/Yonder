@@ -45,6 +45,7 @@ namespace Yonder
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            
 
             app.UseRouting();
 

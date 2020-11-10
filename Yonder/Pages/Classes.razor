@@ -2,6 +2,8 @@
 
 @using Yonder.DataProvider
 
+@inject NavigationManager navigationManager
+
 <h3>Classes</h3>
 @if (classes is null)
 {
@@ -17,7 +19,6 @@ else
                 <th>Description</th>
                 <th>Teacher</th>
                 <th></th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -28,6 +29,7 @@ else
                 <th class="col-auto">@clas.ClassName</th>
                 <th class="col-auto">@clas.Description</th>
                 <th class="col-auto">@clas.TeacherName</th>
+                <th class="col-auto"><button class="btn btn-group-sm" @onclick="@(e => HandleAttendance(@clas))"><span class="oi oi-people"></span></button></th>
             </tr>
             }
         </tbody>
@@ -35,9 +37,9 @@ else
 }
 
 @code {
-    
+
     private List<Yonder.DataProvider.Classes> classes;
-    
+
     protected override void OnInitialized()
     {
 
@@ -45,5 +47,11 @@ else
         {
             classes = dbContext.Classes.ToList();
         }
+    }
+
+    public void HandleAttendance(Yonder.DataProvider.Classes clas)
+    {
+
+        navigationManager.NavigateTo($"/AttendanceTaker/{clas.Id}");
     }
 }

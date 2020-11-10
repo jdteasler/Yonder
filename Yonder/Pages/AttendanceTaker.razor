@@ -1,0 +1,106 @@
+﻿@page "/AttendanceTaker/{Id:int}"
+@using Yonder.DataProvider
+
+@inject NavigationManager navigationManager
+<h3>Attendance</h3>
+@if (clas is null)
+{
+    <h3>Loading........</h3>
+}
+else
+{
+    <table>
+        <tbody>
+            <tr>
+                <td>Class Name: </td>
+                <td>@clas.ClassName</td>
+            </tr>
+            <tr>
+                <td>Teacher: </td>
+                <td>@clas.TeacherName</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <EditForm Model="@roll" OnValidSubmit="HandleValidSubmit">
+        <div class="form-group">
+            <label class="form-control-plaintext">Class Date:</label>
+            <InputDate @bind-Value="@roll.ClassDate" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-plaintext">Class Size:</label>
+            <InputNumber @bind-Value="@roll.ClassSize" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Take Attendance" class="btn btn-primary" />
+        </div>
+    </EditForm>
+
+    @if (rollCalls.Count() == 0)
+    {
+        <h4>No Records Found......</h4>
+    }
+    else
+    {   //TODO: Look at GridView or How to allow pages.
+        <table class="table-striped table-dark">
+            <thead>
+                <tr>
+                    <th class="col-auto">Class Date</th>
+                    <th class="col-auto">Attendance</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var classDate in rollCalls)
+                {
+                    <tr class="text-center">
+                        <td>@classDate.ClassDate.ToShortDateString()</td>
+                        <td>@classDate.ClassSize</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Yonder.DataProvider.Classes clas = new Yonder.DataProvider.Classes();
+    private Yonder.DataProvider.RollCall rollCall = new Yonder.DataProvider.RollCall();
+    private Yonder.Models.RollCallModel roll = new Yonder.Models.RollCallModel();
+    private List<Yonder.DataProvider.RollCall> rollCalls;
+
+    protected override void OnInitialized()
+    {
+        roll.ClassDate = DateTime.Now;
+        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
+        {
+
+            clas = dbContext.Classes.Where(c => c.Id == Id).FirstOrDefault();
+            rollCalls = dbContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            rollCall.ClassSize = roll.ClassSize;
+            rollCall.ClassDate = roll.ClassDate;
+            rollCall.ClassId = clas.Id;
+            using (var dbContext = new YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
+            {
+
+                dbContext.RollCall.Add(rollCall);
+                dbContext.SaveChanges();
+                rollCalls = dbContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
+            }
+            navigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+}
