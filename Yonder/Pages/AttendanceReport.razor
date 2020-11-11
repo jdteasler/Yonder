@@ -1,0 +1,70 @@
+﻿@page "/ClassReport"
+
+@using System.Linq
+
+<h3>Attendance Report</h3>
+<EditForm Model="reportDate" OnValidSubmit="CreateReport">
+    <InputDate @bind-Value="@reportDate" />
+    <input type="submit" value="Run Report" class="btn btn-primary" />
+</EditForm>
+@if (rolls != null)
+{
+    <h4>@reportDate.ToShortDateString()</h4>
+    @if (rolls.Count != 0)
+    {
+        <table class="table d-sm-table table-striped">
+            <thead>
+                <tr>
+                    <td class="col-auto">Class</td>
+                    <td class="col-auto">Today's Attendance</td>
+                    <td class="col-auto">Total Attendance</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attendance in rolls)
+                {
+                    <tr>
+                        <td>@GetClassName(attendance.ClassId)</td>
+                        <td>@attendance.ClassSize</td>
+                        <td />
+                    </tr>
+                }
+                <tr>
+                    <td />
+                    <td />
+                    <td>@rolls.Sum(r => r.ClassSize)</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No Attendance taken for this day.</p>
+    }
+}
+
+@code {
+    private DateTime reportDate;
+    private List<Yonder.DataProvider.RollCall> rolls;
+
+    protected override void OnInitialized()
+    {
+        reportDate = DateTime.Now;
+    }
+
+    private void CreateReport()
+    {
+        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
+        {
+            rolls = dbContext.RollCall.Where(rc => rc.ClassDate == reportDate).ToList();
+        }
+    }
+
+    private string GetClassName(int classId)
+    {
+        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
+        {
+            return dbContext.Classes.FirstOrDefault(c => c.Id == classId).ClassName;
+        }
+    }
+}
