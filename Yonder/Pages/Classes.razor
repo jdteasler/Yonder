@@ -1,7 +1,5 @@
 ﻿@page "/"
-
-@using Yonder.DataProvider
-
+@inject YonderContext yonderContext
 @inject NavigationManager navigationManager
 
 <h3>Classes</h3>
@@ -22,36 +20,30 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach( var clas in classes)
+            @foreach (var clas in classes)
             {
-            <tr class="table-hover">
-                <th class="col-auto">@clas.Id</th>
-                <th class="col-auto">@clas.ClassName</th>
-                <th class="col-auto">@clas.Description</th>
-                <th class="col-auto">@clas.TeacherName</th>
-                <th class="col-auto"><button class="btn btn-group-sm" @onclick="@(e => HandleAttendance(@clas))"><span class="oi oi-people"></span></button></th>
-            </tr>
+                <tr class="table-hover">
+                    <th class="col-auto">@clas.Id</th>
+                    <th class="col-auto">@clas.ClassName</th>
+                    <th class="col-auto">@clas.Description</th>
+                    <th class="col-auto">@clas.TeacherName</th>
+                    <th class="col-auto"><button class="btn btn-group-sm" @onclick="@(e => HandleAttendance(@clas))"><span class="oi oi-people"></span></button></th>
+                </tr>
             }
         </tbody>
     </table>
 }
 
 @code {
-
     private List<Yonder.DataProvider.Classes> classes;
 
     protected override void OnInitialized()
     {
-
-        using(var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
-        {
-            classes = dbContext.Classes.ToList();
-        }
+        classes = yonderContext.Classes.ToList();
     }
 
     public void HandleAttendance(Yonder.DataProvider.Classes clas)
     {
-
         navigationManager.NavigateTo($"/AttendanceTaker/{clas.Id}");
     }
 }

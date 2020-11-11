@@ -1,7 +1,6 @@
 ﻿@page "/ClassReport"
 
-@using System.Linq
-
+@inject YonderContext yonderContext
 <h3>Attendance Report</h3>
 <EditForm Model="reportDate" OnValidSubmit="CreateReport">
     <InputDate @bind-Value="@reportDate" />
@@ -54,17 +53,8 @@
 
     private void CreateReport()
     {
-        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
-        {
-            rolls = dbContext.RollCall.Where(rc => rc.ClassDate == reportDate).ToList();
-        }
+        rolls = yonderContext.RollCall.Where(rc => rc.ClassDate == reportDate).ToList();
     }
 
-    private string GetClassName(int classId)
-    {
-        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
-        {
-            return dbContext.Classes.FirstOrDefault(c => c.Id == classId).ClassName;
-        }
-    }
+    private string GetClassName(int classId) => yonderContext.Classes.FirstOrDefault(c => c.Id == classId).ClassName;
 }
