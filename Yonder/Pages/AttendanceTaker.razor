@@ -1,7 +1,8 @@
 ﻿@page "/AttendanceTaker/{Id:int}"
-@using Yonder.DataProvider
 
 @inject NavigationManager navigationManager
+@inject YonderContext yonderContext
+
 <h3>Attendance</h3>
 @if (clas is null)
 {
@@ -74,12 +75,10 @@ else
     protected override void OnInitialized()
     {
         roll.ClassDate = DateTime.Now;
-        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
-        {
 
-            clas = dbContext.Classes.Where(c => c.Id == Id).FirstOrDefault();
-            rollCalls = dbContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
-        }
+        clas = yonderContext.Classes.Where(c => c.Id == Id).FirstOrDefault();
+        rollCalls = yonderContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
+
     }
 
     private void HandleValidSubmit()
@@ -89,13 +88,11 @@ else
             rollCall.ClassSize = roll.ClassSize;
             rollCall.ClassDate = roll.ClassDate;
             rollCall.ClassId = clas.Id;
-            using (var dbContext = new YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
-            {
 
-                dbContext.RollCall.Add(rollCall);
-                dbContext.SaveChanges();
-                rollCalls = dbContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
-            }
+            yonderContext.RollCall.Add(rollCall);
+            yonderContext.SaveChanges();
+            rollCalls = yonderContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
+
             navigationManager.NavigateTo("/");
         }
         catch (Exception ex)

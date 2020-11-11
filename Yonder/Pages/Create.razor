@@ -1,8 +1,7 @@
 ﻿@page "/Class/Create"
-
-@using Yonder.DataProvider
-
+@inject YonderContext yonderContext
 @inject NavigationManager navigationManager
+
 <h3>Create</h3>
 
 <EditForm Model="@clas" OnValidSubmit="HandleValidSubmit">
@@ -30,16 +29,9 @@
     private Yonder.DataProvider.Classes clas = new Yonder.DataProvider.Classes();
     private async Task HandleValidSubmit()
     {
-
-
-        using (var dbContext = new YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
-        {
-            dbContext.Classes.Add(clas);
-
-            await dbContext.SaveChangesAsync();
-        }
+        yonderContext.Classes.Add(clas);
+        await yonderContext.SaveChangesAsync();
 
         navigationManager.NavigateTo($"/Class/display/{clas.Id}");
     }
-
 }

@@ -1,4 +1,6 @@
 ﻿@page "/Class/Display/{Id:int}"
+@inject YonderContext yonderContext
+
 <h3>Display</h3>
 
 <table>
@@ -32,9 +34,6 @@
 
     protected override void OnInitialized()
     {
-        using (var dbContext = new Yonder.DataProvider.YonderContext(@"Data Source=jdteasler\TeaslerDb;Initial Catalog=YonderDb;Integrated Security=True"))
-        {
-            clas = dbContext.Classes.Where(c => c.Id == Id).FirstOrDefault();
-        }
+        clas = yonderContext.Classes.Where(c => c.Id == Id).FirstOrDefault();
     }
 }
