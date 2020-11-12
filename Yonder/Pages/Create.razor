@@ -32,6 +32,6 @@
         yonderContext.Classes.Add(clas);
         await yonderContext.SaveChangesAsync();
 
-        navigationManager.NavigateTo($"/Class/display/{clas.Id}");
+        navigationManager.NavigateTo($"/Classes");
     }
 }
