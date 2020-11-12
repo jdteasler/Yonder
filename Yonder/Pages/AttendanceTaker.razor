@@ -91,9 +91,11 @@ else
 
             yonderContext.RollCall.Add(rollCall);
             yonderContext.SaveChanges();
-            rollCalls = yonderContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
 
-            navigationManager.NavigateTo("/");
+            rollCalls = yonderContext.RollCall.Where(rc => rc.ClassId == Id).OrderByDescending(rc => rc.ClassDate).ToList();
+            rollCall = new RollCall();
+            roll = new Yonder.Models.RollCallModel() { ClassDate = DateTime.Now };
+            StateHasChanged();
         }
         catch (Exception ex)
         {
