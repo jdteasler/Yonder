@@ -5,4 +5,5 @@
 - Asp.Net Core
 - Server Side Blazor
 
+## About
 Yonder is web application for taking attendance for school or church. Also, Yonder provides running a report to get overall attendance for a specific date.
