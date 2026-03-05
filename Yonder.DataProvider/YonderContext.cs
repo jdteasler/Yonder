@@ -1,15 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-namespace Yonder.DataProvider
+namespace Yonder.DataProvider;
+
+public class YonderContext : DbContext
 {
-    public class YonderContext : DbContext
-    {
-        public YonderContext(DbContextOptions options) : base(options)
-        {
+    public YonderContext(DbContextOptions options) : base(options) { }
 
-        }
-        public DbSet<Classes> Classes { get; set; }
-        public DbSet<RollCall> RollCall { get; set; }
-
-    }
+    public DbSet<Classes> Classes { get; set; } = null!;
+    public DbSet<RollCall> RollCall { get; set; } = null!;
 }

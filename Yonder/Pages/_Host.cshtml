@@ -14,6 +14,7 @@
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
+    <link href="css/reports.css" rel="stylesheet" />
 </head>
 <body>
     <app>
@@ -32,5 +33,27 @@
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+    <script>
+        // Report builder JS helpers
+        window.reportBuilder = {
+            /**
+             * Triggers a browser download of a base64-encoded PDF.
+             * Called from ReportViewer.razor via JS interop.
+             */
+            downloadPdf: function (base64, fileName) {
+                const bytes  = atob(base64);
+                const buffer = new Uint8Array(bytes.length);
+                for (let i = 0; i < bytes.length; i++) buffer[i] = bytes.charCodeAt(i);
+                const blob = new Blob([buffer], { type: 'application/pdf' });
+                const url  = URL.createObjectURL(blob);
+                const a    = document.createElement('a');
+                a.href     = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+            }
+        };
+    </script>
 </body>
 </html>

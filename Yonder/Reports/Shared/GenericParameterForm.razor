@@ -1,0 +1,117 @@
+@*
+    GenericParameterForm – automatically generates a form for any ReportParameters
+    subclass using reflection and System.ComponentModel.DataAnnotations.
+
+    Supports property types: DateTime, string, int, bool.
+    Override by implementing a dedicated form component and returning its Type
+    from your report's ParameterFormComponent property.
+*@
+
+@using System.Reflection
+@using System.ComponentModel.DataAnnotations
+
+<div class="param-form d-print-none">
+    @if (Model != null)
+    {
+        <div class="row g-3 align-items-end">
+            @foreach (var prop in GetProperties())
+            {
+                <div class="col-auto">
+                    <label class="form-label fw-semibold">@GetLabel(prop)</label>
+                    @if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
+                    {
+                        <input type="date" class="form-control"
+                               value="@GetDateString(prop)"
+                               @onchange="@(e => SetDateValue(prop, e.Value?.ToString()))" />
+                    }
+                    else if (prop.PropertyType == typeof(string))
+                    {
+                        <input type="text" class="form-control"
+                               value="@GetStringValue(prop)"
+                               @oninput="@(e => SetStringValue(prop, e.Value?.ToString()))" />
+                    }
+                    else if (prop.PropertyType == typeof(int))
+                    {
+                        <input type="number" class="form-control"
+                               value="@GetIntValue(prop)"
+                               @onchange="@(e => SetIntValue(prop, e.Value?.ToString()))" />
+                    }
+                    else if (prop.PropertyType == typeof(bool))
+                    {
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input"
+                                   checked="@GetBoolValue(prop)"
+                                   @onchange="@(e => SetBoolValue(prop, e.Value))" />
+                        </div>
+                    }
+                </div>
+            }
+            <div class="col-auto">
+                <button class="btn btn-primary" @onclick="Submit" disabled="@IsLoading">
+                    @if (IsLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                    }
+                    Run Report
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public object? Model { get; set; }
+    [Parameter] public EventCallback<object> OnSubmit { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+
+    private IEnumerable<PropertyInfo> GetProperties()
+        => Model?.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                 .Where(p => p.CanWrite)
+           ?? [];
+
+    private string GetLabel(PropertyInfo prop)
+    {
+        var display = prop.GetCustomAttribute<DisplayAttribute>();
+        return display?.Name ?? SplitCamelCase(prop.Name);
+    }
+
+    private string GetDateString(PropertyInfo prop)
+    {
+        return prop.GetValue(Model) is DateTime dt
+            ? dt.ToString("yyyy-MM-dd")
+            : string.Empty;
+    }
+
+    private string? GetStringValue(PropertyInfo prop)
+        => prop.GetValue(Model) as string;
+
+    private string GetIntValue(PropertyInfo prop)
+        => prop.GetValue(Model)?.ToString() ?? "0";
+
+    private bool GetBoolValue(PropertyInfo prop)
+        => prop.GetValue(Model) is bool b && b;
+
+    private void SetDateValue(PropertyInfo prop, string? value)
+    {
+        if (DateTime.TryParse(value, out var dt))
+            prop.SetValue(Model, dt);
+    }
+
+    private void SetStringValue(PropertyInfo prop, string? value)
+        => prop.SetValue(Model, value);
+
+    private void SetIntValue(PropertyInfo prop, string? value)
+    {
+        if (int.TryParse(value, out var n))
+            prop.SetValue(Model, n);
+    }
+
+    private void SetBoolValue(PropertyInfo prop, object? value)
+        => prop.SetValue(Model, value is bool b ? b : value?.ToString() == "true");
+
+    private async Task Submit()
+        => await OnSubmit.InvokeAsync(Model);
+
+    private static string SplitCamelCase(string s)
+        => System.Text.RegularExpressions.Regex.Replace(s, "([A-Z])", " $1").Trim();
+}

@@ -1,0 +1,133 @@
+@page "/Reports/{Key}"
+
+@inject Yonder.Reports.Core.ReportRegistry Registry
+@inject Yonder.Reports.Core.PdfExportService PdfExport
+@inject IServiceProvider ServiceProvider
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+@using System.Text.Json
+@using Yonder.Reports.Core
+@using Yonder.Reports.Shared
+
+@if (_report == null)
+{
+    <div class="container-fluid px-4 py-4">
+        <div class="alert alert-danger">
+            Report <strong>@Key</strong> was not found in the catalog.
+            <a href="/Reports" class="alert-link">Back to catalog</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid px-0">
+        <!-- ── Toolbar (hidden when printing) ─────────────────────────── -->
+        <div class="report-viewer-toolbar d-print-none px-4 py-2">
+            <div class="d-flex align-items-center gap-2">
+                <a href="/Reports" class="btn btn-sm btn-outline-secondary">← Catalog</a>
+                <h5 class="mb-0 ms-2">@_report.Title</h5>
+            </div>
+        </div>
+
+        <!-- ── Parameter form ─────────────────────────────────────────── -->
+        <div class="px-4 py-3 border-bottom d-print-none">
+            <GenericParameterForm Model="@_parameters"
+                                  OnSubmit="HandleRunReport"
+                                  IsLoading="@_isLoading" />
+        </div>
+
+        <!-- ── Status / errors ────────────────────────────────────────── -->
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="px-4 pt-3 d-print-none">
+                <div class="alert alert-danger">@_errorMessage</div>
+            </div>
+        }
+
+        <!-- ── Report preview ─────────────────────────────────────────── -->
+        @if (_reportData != null && _previewParams != null)
+        {
+            <div class="px-4 pt-3">
+                <DynamicComponent Type="@_report.PreviewComponent"
+                                  Parameters="@_previewParams" />
+            </div>
+        }
+        else if (!_isLoading && _reportData == null)
+        {
+            <div class="px-4 pt-5 text-center text-muted d-print-none">
+                <p class="fs-5">Fill in the parameters above and click <strong>Run Report</strong>.</p>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string Key { get; set; } = "";
+
+    private IReport?                       _report;
+    private object?                        _parameters;
+    private object?                        _reportData;
+    private Dictionary<string, object>?    _previewParams;
+    private bool                           _isLoading;
+    private string?                        _errorMessage;
+
+    protected override void OnParametersSet()
+    {
+        _report     = Registry.GetReport(Key);
+        _parameters = _report is not null
+            ? Activator.CreateInstance(_report.ParametersType)
+            : null;
+
+        // Reset state when the key changes
+        _reportData    = null;
+        _previewParams = null;
+        _errorMessage  = null;
+    }
+
+    private async Task HandleRunReport(object submittedParams)
+    {
+        if (_report == null) return;
+
+        _isLoading    = true;
+        _errorMessage = null;
+        _reportData   = null;
+        StateHasChanged();
+
+        try
+        {
+            _reportData    = await _report.FetchDataAsync(submittedParams, ServiceProvider);
+            _previewParams = _report.BuildPreviewParameters(_reportData, submittedParams);
+
+            // Attach the download callback into the preview parameter dictionary
+            _previewParams["DownloadRequested"] = EventCallback.Factory.Create(
+                this, () => DownloadPdf(submittedParams));
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error running report: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task DownloadPdf(object parameters)
+    {
+        if (_report == null || _reportData == null) return;
+
+        try
+        {
+            var pdfBytes = _report.ExportPdf(_reportData, parameters);
+            var base64   = Convert.ToBase64String(pdfBytes);
+            var fileName = $"{_report.Key}-{DateTime.Today:yyyy-MM-dd}.pdf";
+
+            await JS.InvokeVoidAsync("reportBuilder.downloadPdf", base64, fileName);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"PDF export failed: {ex.Message}";
+        }
+    }
+}

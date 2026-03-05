@@ -1,0 +1,41 @@
+@*
+    ReportDataTable – generic striped data table for report previews.
+    Usage:
+        <ReportDataTable Columns="@cols" Rows="@rows" />
+
+    Where cols is IReadOnlyList<ReportColumn<T>> and rows is IReadOnlyList<T>.
+
+    Because Razor generics have limited inference you can use the typed
+    ReportDataTable<T> variant defined at the bottom of this file, or wrap
+    the untyped version:
+
+        <ReportDataTable>
+            <HeaderTemplate>
+                <th>Class</th><th>Attendance</th>
+            </HeaderTemplate>
+            <RowTemplate Context="row">
+                <td>@row.ClassName</td><td>@row.Count</td>
+            </RowTemplate>
+        </ReportDataTable>
+*@
+
+<table class="report-table">
+    <thead>
+        <tr>@HeaderTemplate</tr>
+    </thead>
+    <tbody>
+        @BodyContent
+    </tbody>
+    @if (FooterTemplate != null)
+    {
+        <tfoot>
+            <tr class="report-table__footer-row">@FooterTemplate</tr>
+        </tfoot>
+    }
+</table>
+
+@code {
+    [Parameter] public RenderFragment? HeaderTemplate { get; set; }
+    [Parameter] public RenderFragment? BodyContent { get; set; }
+    [Parameter] public RenderFragment? FooterTemplate { get; set; }
+}

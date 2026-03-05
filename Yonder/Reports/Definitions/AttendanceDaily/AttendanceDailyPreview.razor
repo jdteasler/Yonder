@@ -1,0 +1,70 @@
+@*
+    AttendanceDailyPreview – Blazor browser preview for the Daily Attendance Report.
+
+    Receives strongly-typed Data + Params from the ReportViewer page via
+    DynamicComponent, mirrors the visual structure of the PDF layout.
+*@
+
+@using Yonder.Reports.Shared
+
+@if (Data is null)
+{
+    <p class="text-muted">No data to display.</p>
+}
+else
+{
+    <ReportPage Title="Daily Attendance Report"
+                Subtitle="@Data.ReportDate.ToString("MMMM d, yyyy")"
+                OnDownloadPdf="@DownloadRequested">
+
+        <div class="stat-card-row">
+            <StatCard Label="Classes Active"   Value="@Data.TotalClasses.ToString()" />
+            <StatCard Label="Total Attendance" Value="@Data.TotalAttendance.ToString("N0")" />
+            <StatCard Label="Report Date"      Value="@Data.ReportDate.ToString("MMM d, yyyy")" />
+        </div>
+
+        <ReportSection Heading="Class Breakdown">
+            @if (Data.Rows.Count == 0)
+            {
+                <p class="text-muted fst-italic">No attendance records found for this date.</p>
+            }
+            else
+            {
+                <ReportDataTable>
+                    <HeaderTemplate>
+                        <th>Class</th>
+                        <th>Teacher</th>
+                        <th class="text-end">Attendance</th>
+                    </HeaderTemplate>
+                    <BodyContent>
+                        @foreach (var row in Data.Rows)
+                        {
+                            <tr>
+                                <td>@row.ClassName</td>
+                                <td>@row.TeacherName</td>
+                                <td class="text-end">@row.ClassSize.ToString("N0")</td>
+                            </tr>
+                        }
+                    </BodyContent>
+                    <FooterTemplate>
+                        <td colspan="2" class="fw-bold">Total</td>
+                        <td class="text-end fw-bold">@Data.TotalAttendance.ToString("N0")</td>
+                    </FooterTemplate>
+                </ReportDataTable>
+            }
+        </ReportSection>
+
+    </ReportPage>
+}
+
+@code {
+    [Parameter] public AttendanceDailyData? Data   { get; set; }
+    [Parameter] public SingleDateParameters? Params { get; set; }
+
+    /// <summary>
+    /// Bubbles up to the ReportViewer page which triggers the PDF API call.
+    /// Wired via EventCallback in the parent; ReportPage calls it when the user
+    /// clicks "Download PDF".
+    /// </summary>
+    [Parameter] public EventCallback DownloadRequested { get; set; }
+}

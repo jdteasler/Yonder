@@ -1,0 +1,19 @@
+@*
+    ReportSection – a visually separated content block with a heading.
+    Usage:
+        <ReportSection Heading="Class Breakdown">
+            … any content …
+        </ReportSection>
+*@
+
+<div class="report-section">
+    <h3 class="report-section__heading">@Heading</h3>
+    <div class="report-section__body">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Heading { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

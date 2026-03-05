@@ -1,0 +1,282 @@
+/* ============================================================
+   reports.css  –  Yonder Report Builder styles
+   ============================================================
+   Covers:
+     • .report-paper          – the white "page" preview surface
+     • .report-section        – titled section blocks
+     • .report-table          – data tables
+     • .stat-card / .stat-card-row – summary metric boxes
+     • .param-form            – parameter input strip
+     • .report-catalog-card   – catalog listing cards
+     • .report-viewer-toolbar – viewer page top bar
+     • @media print           – print-optimised overrides
+   ============================================================ */
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+    --rpt-primary:      #1e40af;
+    --rpt-accent:       #3b82f6;
+    --rpt-bg:           #f8fafc;
+    --rpt-border:       #cbd5e1;
+    --rpt-alt-row:      #f0f4ff;
+    --rpt-text:         #1e293b;
+    --rpt-muted:        #64748b;
+    --rpt-header-bg:    #1e40af;
+    --rpt-header-text:  #ffffff;
+    --rpt-paper-shadow: 0 4px 24px rgba(0,0,0,.10);
+}
+
+/* ── Paper surface ─────────────────────────────────────────── */
+.report-paper {
+    background:    #ffffff;
+    max-width:     880px;
+    margin:        0 auto 2rem;
+    box-shadow:    var(--rpt-paper-shadow);
+    border-radius: 4px;
+    overflow:      hidden;
+    font-family:   'Segoe UI', Arial, sans-serif;
+    font-size:     14px;
+    color:         var(--rpt-text);
+}
+
+.report-paper__header {
+    display:          flex;
+    justify-content:  space-between;
+    align-items:      flex-start;
+    background:       var(--rpt-header-bg);
+    color:            var(--rpt-header-text);
+    padding:          1.25rem 2rem;
+}
+
+.report-paper__title {
+    font-size:    1.5rem;
+    font-weight:  700;
+    line-height:  1.2;
+}
+
+.report-paper__subtitle {
+    font-size:   .875rem;
+    opacity:     .85;
+    margin-top:  .25rem;
+}
+
+.report-paper__header-right {
+    text-align:  right;
+    font-size:   .75rem;
+    opacity:     .8;
+    line-height: 1.6;
+}
+
+.report-paper__body {
+    padding: 1.75rem 2rem;
+}
+
+.report-paper__footer {
+    display:         flex;
+    justify-content: space-between;
+    padding:         .75rem 2rem;
+    border-top:      1px solid var(--rpt-border);
+    background:      var(--rpt-bg);
+    font-size:       .75rem;
+    color:           var(--rpt-muted);
+}
+
+/* ── Toolbar ───────────────────────────────────────────────── */
+.report-toolbar {
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    padding:         .75rem 1.5rem;
+    background:      var(--rpt-bg);
+    border-bottom:   1px solid var(--rpt-border);
+    gap:             1rem;
+}
+
+.report-toolbar__title {
+    font-size:   1.1rem;
+    font-weight: 600;
+    color:       var(--rpt-primary);
+    margin:      0;
+}
+
+.report-toolbar__actions {
+    display: flex;
+    gap:     .5rem;
+    flex-shrink: 0;
+}
+
+.report-viewer-toolbar {
+    background:    var(--rpt-bg);
+    border-bottom: 1px solid var(--rpt-border);
+}
+
+/* ── Section ───────────────────────────────────────────────── */
+.report-section {
+    margin-top: 1.75rem;
+}
+
+.report-section__heading {
+    font-size:     .95rem;
+    font-weight:   700;
+    color:         var(--rpt-primary);
+    margin-bottom: .4rem;
+    padding-bottom: .4rem;
+    border-bottom: 2px solid var(--rpt-accent);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.report-section__body {
+    margin-top: .75rem;
+}
+
+/* ── Data table ────────────────────────────────────────────── */
+.report-table {
+    width:           100%;
+    border-collapse: collapse;
+    font-size:       .875rem;
+}
+
+.report-table thead tr {
+    background: var(--rpt-header-bg);
+    color:      var(--rpt-header-text);
+}
+
+.report-table thead th {
+    padding:     .55rem .75rem;
+    font-weight: 600;
+    font-size:   .8rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    white-space:    nowrap;
+}
+
+.report-table tbody tr:nth-child(even) {
+    background: var(--rpt-alt-row);
+}
+
+.report-table tbody tr:hover {
+    background: #e0e7ff;
+}
+
+.report-table tbody td {
+    padding:       .45rem .75rem;
+    border-bottom: 1px solid var(--rpt-border);
+    vertical-align: middle;
+}
+
+.report-table tfoot tr.report-table__footer-row {
+    background:  var(--rpt-alt-row);
+    border-top:  2px solid var(--rpt-border);
+}
+
+.report-table tfoot td {
+    padding: .5rem .75rem;
+}
+
+/* ── Stat cards ────────────────────────────────────────────── */
+.stat-card-row {
+    display:   flex;
+    gap:       1rem;
+    flex-wrap: wrap;
+    margin:    1rem 0 .5rem;
+}
+
+.stat-card {
+    flex:          1 1 140px;
+    background:    var(--rpt-alt-row);
+    border:        1px solid var(--rpt-border);
+    border-radius: 6px;
+    padding:       1rem 1.25rem;
+    min-width:     120px;
+}
+
+.stat-card__value {
+    font-size:   1.75rem;
+    font-weight: 700;
+    color:       var(--rpt-primary);
+    line-height: 1.1;
+}
+
+.stat-card__label {
+    font-size:   .75rem;
+    color:       var(--rpt-muted);
+    margin-top:  .3rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.stat-card__sub {
+    font-size:  .7rem;
+    color:      var(--rpt-muted);
+    margin-top: .2rem;
+}
+
+/* ── Parameter form ────────────────────────────────────────── */
+.param-form {
+    background:    var(--rpt-bg);
+    padding:       1rem 0;
+}
+
+.param-form .form-label {
+    font-size: .8rem;
+    color:     var(--rpt-muted);
+    margin-bottom: .3rem;
+}
+
+/* ── Catalog cards ─────────────────────────────────────────── */
+.report-catalog-card {
+    transition:    box-shadow .15s ease, transform .15s ease;
+    border-radius: 8px;
+}
+
+.report-catalog-card:hover {
+    box-shadow: 0 4px 16px rgba(30, 64, 175, .15);
+    transform:  translateY(-2px);
+}
+
+/* ── Print overrides ───────────────────────────────────────── */
+@media print {
+    /* Hide everything except the report paper */
+    body > * {
+        display: none !important;
+    }
+
+    /* Blazor renders inside <app>, so target the print area */
+    #report-print-area {
+        display: block !important;
+    }
+
+    .report-paper {
+        box-shadow:    none;
+        border-radius: 0;
+        max-width:     100%;
+        margin:        0;
+    }
+
+    .report-paper__body {
+        padding: 1rem 1.5rem;
+    }
+
+    .report-table tbody tr:hover {
+        background: inherit;
+    }
+
+    .stat-card-row {
+        page-break-inside: avoid;
+    }
+
+    .report-section {
+        page-break-inside: avoid;
+    }
+
+    /* Force page to start after the header for long reports */
+    .report-section + .report-section {
+        page-break-before: auto;
+    }
+
+    @page {
+        size:   letter portrait;
+        margin: 15mm 12mm;
+    }
+}

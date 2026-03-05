@@ -1,0 +1,58 @@
+@*
+    ReportPage – wrapper for every report preview.
+    Renders a print-ready "paper" surface with optional print/download buttons.
+    Usage:
+        <ReportPage Title="Daily Attendance" Subtitle="March 5, 2026" OnDownloadPdf="HandleDownload">
+            … report content …
+        </ReportPage>
+*@
+
+@inject IJSRuntime JS
+
+<div class="report-toolbar d-print-none">
+    <h2 class="report-toolbar__title">@Title</h2>
+    <div class="report-toolbar__actions">
+        @if (OnDownloadPdf.HasDelegate)
+        {
+            <button class="btn btn-primary btn-sm me-2" @onclick="OnDownloadPdf">
+                ⬇ Download PDF
+            </button>
+        }
+        <button class="btn btn-outline-secondary btn-sm" @onclick="PrintPage">
+            🖨 Print
+        </button>
+    </div>
+</div>
+
+<div class="report-paper" id="report-print-area">
+    <div class="report-paper__header">
+        <div class="report-paper__header-left">
+            <div class="report-paper__title">@Title</div>
+            @if (!string.IsNullOrWhiteSpace(Subtitle))
+            {
+                <div class="report-paper__subtitle">@Subtitle</div>
+            }
+        </div>
+        <div class="report-paper__header-right">
+            <div class="report-paper__generated">Generated @DateTime.Now.ToString("MMM d, yyyy")</div>
+            <div class="report-paper__org">Yonder Attendance System</div>
+        </div>
+    </div>
+    <div class="report-paper__body">
+        @ChildContent
+    </div>
+    <div class="report-paper__footer">
+        <span>Yonder Attendance System</span>
+        <span>@DateTime.Now.ToString("MMMM d, yyyy 'at' h:mm tt")</span>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string Subtitle { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback OnDownloadPdf { get; set; }
+
+    private async Task PrintPage()
+        => await JS.InvokeVoidAsync("window.print");
+}

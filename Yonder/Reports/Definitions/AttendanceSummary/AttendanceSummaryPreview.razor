@@ -1,0 +1,88 @@
+@*
+    AttendanceSummaryPreview – Blazor browser preview for the Attendance Summary Report.
+*@
+
+@using Yonder.Reports.Shared
+
+@if (Data is null)
+{
+    <p class="text-muted">No data to display.</p>
+}
+else
+{
+    <ReportPage Title="Attendance Summary Report"
+                Subtitle="@($"{Data.StartDate:MMM d, yyyy}  –  {Data.EndDate:MMM d, yyyy}")"
+                OnDownloadPdf="@DownloadRequested">
+
+        <div class="stat-card-row">
+            <StatCard Label="Total Attendance"   Value="@Data.TotalAttendance.ToString("N0")" />
+            <StatCard Label="Sessions Recorded"  Value="@Data.TotalSessions.ToString()" />
+            <StatCard Label="Daily Average"      Value="@Data.AverageDaily.ToString("N1")" />
+            <StatCard Label="Peak Day"           Value="@Data.PeakAttendance.ToString("N0")" />
+        </div>
+
+        <ReportSection Heading="Class Summary">
+            @if (Data.ClassRows.Count == 0)
+            {
+                <p class="text-muted fst-italic">No records in this date range.</p>
+            }
+            else
+            {
+                <ReportDataTable>
+                    <HeaderTemplate>
+                        <th>Class</th>
+                        <th>Teacher</th>
+                        <th class="text-end">Sessions</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">Avg / Session</th>
+                    </HeaderTemplate>
+                    <BodyContent>
+                        @foreach (var row in Data.ClassRows)
+                        {
+                            <tr>
+                                <td>@row.ClassName</td>
+                                <td>@row.TeacherName</td>
+                                <td class="text-end">@row.Sessions</td>
+                                <td class="text-end">@row.TotalAttendance.ToString("N0")</td>
+                                <td class="text-end">@row.AverageAttendance.ToString("N1")</td>
+                            </tr>
+                        }
+                    </BodyContent>
+                    <FooterTemplate>
+                        <td colspan="3" class="fw-bold">Total</td>
+                        <td class="text-end fw-bold">@Data.TotalAttendance.ToString("N0")</td>
+                        <td></td>
+                    </FooterTemplate>
+                </ReportDataTable>
+            }
+        </ReportSection>
+
+        @if (Data.DailyTotals.Count > 1)
+        {
+            <ReportSection Heading="Daily Trend">
+                <ReportDataTable>
+                    <HeaderTemplate>
+                        <th>Date</th>
+                        <th class="text-end">Attendance</th>
+                    </HeaderTemplate>
+                    <BodyContent>
+                        @foreach (var day in Data.DailyTotals)
+                        {
+                            <tr>
+                                <td>@day.Date.ToString("ddd, MMM d, yyyy")</td>
+                                <td class="text-end">@day.Total.ToString("N0")</td>
+                            </tr>
+                        }
+                    </BodyContent>
+                </ReportDataTable>
+            </ReportSection>
+        }
+
+    </ReportPage>
+}
+
+@code {
+    [Parameter] public AttendanceSummaryData?  Data   { get; set; }
+    [Parameter] public DateRangeParameters?    Params { get; set; }
+    [Parameter] public EventCallback           DownloadRequested { get; set; }
+}
