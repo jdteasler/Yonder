@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Vb6Lint.Rules</AssemblyName>
+    <RootNamespace>Vb6Lint.Rules</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vb6Lint.Core\Vb6Lint.Core.csproj" />
+  </ItemGroup>
+</Project>

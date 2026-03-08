@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Vb6Lint.Core</AssemblyName>
+    <RootNamespace>Vb6Lint.Core</RootNamespace>
+  </PropertyGroup>
+</Project>
